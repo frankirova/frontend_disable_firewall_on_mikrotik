@@ -1,45 +1,112 @@
-import { useEffect, useState } from "react";
-import "./App.css";
+import {
+  Button,
+  Container,
+  Flex,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Select,
+  VStack,
+  useToast,
+} from "@chakra-ui/react";
 import { useForm } from "./hooks/useForm";
 
 function App() {
+  const toast = useToast();
   const { handleChange, formState } = useForm();
-
   const url = "http://localhost:8000";
 
+  const showToastSuccess = () => {
+    toast({
+      description: "Realizado",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
+  };
+
+  const showToastFail = (error) => {
+    toast({
+      title: "Error",
+      description: `${error}`,
+      status: "error",
+      duration: 9000,
+      isClosable: true,
+    });
+  };
+
   const executeScript = (event) => {
-    event.preventDefault(); // Evita que el formulario se envíe por defecto
+    event.preventDefault();
     fetch("http://localhost:8000/script", {
       method: "POST",
       body: JSON.stringify(formState),
       headers: {
         "Content-Type": "application/json",
-        Origin: url, // Asegúrate de incluir el encabezado Origin
+        Origin: url,
       },
       mode: "no-cors",
     })
-      .then((data) => {
-        // Aquí puedes hacer algo con la respuesta de la API
-        console.log(data);
+      .then(() => {
+        showToastSuccess();
       })
       .catch((error) => {
-        // Aquí puedes manejar errores que ocurran durante la solicitud a la API
+        showToastFail(error);
         console.error(error);
       });
-      console.log(formState)
-    };
+  };
+  const options = [
+    "192.168.2.238",
+    "64.76.121.146",
+    "64.76.121.147",
+    "64.76.121.143",
+    "64.76.121.243",
+    "168.194.32.50",
+    "168.194.32.71",
+    "168.194.32.21",
+    "168.194.32.14",
+    "168.194.34.196",
+    "168.194.34.197",
+  ];
 
   return (
-    <>
-      <form onSubmit={executeScript}>
-        <label>ip mikrotik</label>
-        <input onChange={handleChange} name="IP_MIKROTIK" type="text" />
+    <Container>
+      <Flex direction={"column"} gap={6}>
+        <Heading>CortesApp - RedMetro</Heading>
+        <form onSubmit={executeScript}>
+          <VStack spacing={4} align="stretch">
+            <FormControl isRequired>
+              <FormLabel>IP MIKROTIK</FormLabel>
+              <Select
+                placeholder="Seleccione una opción"
+                onChange={handleChange}
+                name="IP_MIKROTIK"
+                value={formState.IP_MIKROTIK}
+              >
+                {options.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
 
-        <label>nombre de la hoja</label>
-        <input onChange={handleChange} name="SPREADSHEET_NAME" type="text" />
-        <button type="submit">submit</button>
-      </form>
-    </>
+            <FormControl isRequired>
+              <FormLabel>NOMBRE DE LA HOJA</FormLabel>
+              <Input
+                type="text"
+                name="SPREADSHEET_NAME"
+                value={formState.SPREADSHEET_NAME}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <Button type="submit" colorScheme="blue">
+              Enviar
+            </Button>
+          </VStack>
+        </form>
+      </Flex>
+    </Container>
   );
 }
 export default App;
