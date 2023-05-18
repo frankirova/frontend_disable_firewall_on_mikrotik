@@ -8,14 +8,15 @@ import {
   FormLabel,
   Input,
   Select,
+  Text,
   VStack,
 } from "@chakra-ui/react";
 import { Context } from "./context/context";
 
 export const Form = ({ setCurrentStep }) => {
   const { updateData, updateForm } = useContext(Context);
-
   const { handleChange, formState } = useForm();
+  const [apiError, setApiError] = useState();
 
   const options = [
     "192.168.2.238",
@@ -31,26 +32,60 @@ export const Form = ({ setCurrentStep }) => {
     "168.194.34.197",
   ];
 
-  const preview = (e) => {
+  const preview = async (e) => {
     e.preventDefault();
-    updateForm(formState);
-    fetch("http://localhost:8000/preview", {
-      method: "POST",
-      body: JSON.stringify(formState),
-      headers: {
-        "Content-Type": "application/json",
-        Origin: "http://localhost:8000", // Asegúrate de incluir el encabezado Origin
-      },
-      mode: "cors",
-    })
-      .then((response) => response.json())
-      .then((data) => updateData(data))
-      .catch((error) => console.log(error));
-    setCurrentStep(1);
+    try {
+      const response = await fetch("http://localhost:8000/preview", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formState),
+      });
+      if (response.ok) {
+        // La llamada a la API fue exitosa
+        setApiError("");
+        const data = await response.json();
+        updateData(data);
+        updateForm(formState)
+        setCurrentStep(1);
+        // Continuar con el flujo deseado
+      } else if (response.status === 404) {
+        // La llamada a la API devolvió un código de respuesta 404
+        setApiError("Error: API responded with 404");
+        updateData(null);
+      } else {
+        // Otro código de respuesta de error
+        setApiError("Error: API responded with an unknown error");
+        updateData(null);
+      }
+    } catch (error) {
+      // Error de red u otro error no esperado
+      setApiError("Error: Failed to call the API");
+      updateData(null);
+    }
+    // updateForm(formState);
+    // fetch("http://localhost:8000/preview", {
+    //   method: "POST",
+    //   body: JSON.stringify(formState),
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Origin: "http://localhost:8000", // Asegúrate de incluir el encabezado Origin
+    //   },
+    //   mode: "cors",
+    // })
+    //   .then((response) => response.json())
+    //   .then((data) => updateData(data))
+    //   .catch((error) => console.log(error));
   };
 
   return (
     <Container>
+      {apiError && (
+        <Text color="red" my={2}>
+          {apiError}
+        </Text>
+      )}
       <form onSubmit={preview}>
         <VStack spacing={4} align="stretch">
           <FormControl isRequired>

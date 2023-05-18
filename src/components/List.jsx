@@ -20,7 +20,6 @@ import { Context } from "./context/context";
 export const List = ({ setCurrentStep }) => {
   const { data, form } = useContext(Context);
   const toast = useToast();
-
   // const [highlightedAfter, setHighlightedAfter] = useState([]);
   if (!data || !data[0]) {
     return (
