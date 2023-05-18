@@ -1,21 +1,27 @@
 import {
+  Box,
   Button,
   Center,
-  Flex,
   Heading,
   Spinner,
+  Table,
+  Tag,
+  Tbody,
+  Td,
   Text,
+  Th,
+  Thead,
+  Tr,
   useToast,
 } from "@chakra-ui/react";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Context } from "./context/context";
-import { useForm } from "../hooks/useForm";
 
-export const List = () => {
+export const List = ({ setCurrentStep }) => {
   const { data, form } = useContext(Context);
-  console.log(form);
   const toast = useToast();
 
+  // const [highlightedAfter, setHighlightedAfter] = useState([]);
   if (!data || !data[0]) {
     return (
       <Center>
@@ -23,6 +29,17 @@ export const List = () => {
       </Center>
     );
   }
+
+  // const highlightDifferences = () => {
+  //   const differences = data[1].filter(
+  //     (item1) => !data[0].some((item2) => item1.id === item2.id)
+  //   );
+  //   const highlightedAfter = data[1].map((item) => {
+  //     const isDifferent = differences.some((diff) => diff.id === item.id);
+  //     return { ...item, isDifferent };
+  //   });
+  //   setHighlightedAfter(highlightedAfter);
+  // };
 
   const url = "http://localhost:8000";
   const showToastSuccess = () => {
@@ -57,41 +74,80 @@ export const List = () => {
     })
       .then(() => {
         showToastSuccess();
+        setCurrentStep(0);
       })
       .catch((error) => {
         showToastFail(error);
         console.error(error);
       });
   };
+
   return (
-    <>
-      <Flex alignItems="center" justifyContent="space-around" gap={6} my={6}>
-        <Flex direction={"column"}>
-          <Heading>Antes</Heading>
-          <Text color="red">{`(${data[0].length})`}</Text>
-          {data[0].map((item) => (
-            <Flex direction={"column"} padding={6} key={item.ip}>
-              <Text>{item.ip}</Text>
-              <Text>{item.comment}</Text>
-            </Flex>
-          ))}
-        </Flex>
-        <Flex direction={"column"}>
-          <Heading>Desp</Heading>
-          <Text color="red">{`(${data[1].length})`}</Text>
-          {data[1].map((item) => (
-            <Flex direction={"column"} padding={6} key={item.ip}>
-              <Text>{item.ip}</Text>
-              <Text>{item.comment}</Text>
-            </Flex>
-          ))}
-        </Flex>
-      </Flex>
+    <Table>
+      <Thead>
+        <Tr display="flex" justifyContent="space-around">
+          <Th>
+            <Heading>Antes</Heading>
+            <Tag
+              colorScheme="red"
+              paddingX={2}
+              paddingY={1}
+            >{`(${data[0].length})`}</Tag>
+          </Th>
+
+          <Th>
+            <Heading>Despues</Heading>
+            <Tag
+              colorScheme="red"
+              paddingX={2}
+              paddingY={1}
+            >{`(${data[1].length})`}</Tag>
+          </Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        <Tr display="flex">
+          <Td>
+            {data[0].map((item) => (
+              <Box
+                minH="110px"
+                padding={6}
+                boxShadow="0 0 0 1px gray"
+                borderRadius="md"
+                bg="green.200"
+                my={4}
+              >
+                <Text>{item.ip}</Text>
+                <Text>{item.comment}</Text>
+              </Box>
+            ))}
+          </Td>
+          <Td>
+            {data[1].map((item) => (
+              <Box
+                minH="110px"
+                padding={6}
+                boxShadow="0 0 0 1px gray"
+                borderRadius="md"
+                bg="green.200"
+                // color={item.isDifferent ? "red.200" : "green.200"}
+                my={4}
+              >
+                <Text>{item.ip}</Text>
+                <Text>{item.comment}</Text>
+              </Box>
+            ))}
+          </Td>
+        </Tr>
+      </Tbody>
       <Center>
-        <Button onClick={executeScript} colorScheme="blue">
+        <Button onClick={executeScript} colorScheme="blue" my={4}>
           Enviar
         </Button>
+        {/* <Button onClick={highlightDifferences} colorScheme="blue" my={4}>
+          Ver
+        </Button> */}
       </Center>
-    </>
+    </Table>
   );
 };

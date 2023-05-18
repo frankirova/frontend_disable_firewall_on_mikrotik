@@ -15,7 +15,7 @@ function App() {
           <Form setCurrentStep={setCurrentStep} />
         </Flex>
       )}
-      {currentStep == 1 && <List />}
+      {currentStep == 1 && <List setCurrentStep={setCurrentStep} />}
     </Box>
   );
 }

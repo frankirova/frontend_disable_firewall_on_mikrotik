@@ -33,8 +33,8 @@ export const Form = ({ setCurrentStep }) => {
 
   const preview = (e) => {
     e.preventDefault();
-    updateForm(formState)
-    fetch("http://127.0.0.1:8000/preview", {
+    updateForm(formState);
+    fetch("http://localhost:8000/preview", {
       method: "POST",
       body: JSON.stringify(formState),
       headers: {
@@ -44,7 +44,7 @@ export const Form = ({ setCurrentStep }) => {
       mode: "cors",
     })
       .then((response) => response.json())
-      .then((data) => {updateData(data)})
+      .then((data) => updateData(data))
       .catch((error) => console.log(error));
     setCurrentStep(1);
   };
@@ -67,6 +67,10 @@ export const Form = ({ setCurrentStep }) => {
                 </option>
               ))}
             </Select>
+          </FormControl>
+
+          <FormControl>
+            <Input type="date" />
           </FormControl>
 
           <FormControl isRequired>
