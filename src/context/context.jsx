@@ -4,13 +4,16 @@ export const Context = createContext({});
 export const Provider = ({ children }) => {
   const [data, setData] = useState([]);
   const [form, setForm] = useState({});
+  const [newOption, setNewOption] = useState();
   const updateForm = (datito) => {
     setForm(datito);
   };
   const updateData = (datito) => {
     setData(datito);
   };
-
+  // const updateOptions = (datito) => {
+  //   setNewOption(datito)
+  // };
   return (
     <Context.Provider
       value={{
@@ -18,6 +21,8 @@ export const Provider = ({ children }) => {
         data,
         updateForm,
         form,
+        // updateOptions,
+        // newOption,
       }}
     >
       {children}

@@ -1,36 +1,96 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Context } from "../context/context";
 import { useForm } from "../hooks/useForm";
+import { ModalNewOption } from "./ModalNewOption";
 
 import {
+  Select,
+  Input,
   Button,
-  Container,
+  useDisclosure,
+  VStack,
   FormControl,
   FormLabel,
-  Input,
-  Select,
-  Text,
-  VStack,
+  Container,
 } from "@chakra-ui/react";
-import { Context } from "./context/context";
 
 export const Form = ({ setCurrentStep }) => {
+  const [options, setOptions] = useState([]);
+  const [newOption, setNewOption] = useState({});
+  const [apiError, setApiError] = useState("");
+  const [optionAdded, setOptionAdded] = useState(true);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { updateData, updateForm } = useContext(Context);
   const { handleChange, formState } = useForm();
-  const [apiError, setApiError] = useState();
 
-  const options = [
-    "192.168.2.238",
-    "64.76.121.146",
-    "64.76.121.147",
-    "64.76.121.143",
-    "64.76.121.243",
-    "168.194.32.50",
-    "168.194.32.71",
-    "168.194.32.21",
-    "168.194.32.14",
-    "168.194.34.196",
-    "168.194.34.197",
-  ];
+  const handleChangeOption = ({ target: { name, value } }) => {
+    setNewOption({
+      ...newOption,
+      [name]: value,
+    });
+  };
+
+  const readOptions = async () => {
+    try {
+      const url = "http://localhost:8000/readOptions";
+      const requestOptions = {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      };
+      const response = await fetch(url, requestOptions);
+
+      // Verificar si la solicitud fue exitosa
+      if (response.ok) {
+        const result = await response.json();
+        setOptions(result.data); // Mostrar el mensaje de éxito en la consola
+      } else {
+        throw new Error("Error al agregar los datos a la base de datos");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const addOption = async () => {
+    // Función para llamar a la API y agregar los datos a la base de datos
+
+    try {
+      const url = "http://localhost:8000/addDoc";
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newOption),
+      };
+
+      // Realizar la solicitud al servidor
+      const response = await fetch(url, requestOptions);
+
+      // Verificar si la solicitud fue exitosa
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result.data); // Mostrar el mensaje de éxito en la consola
+      } else {
+        throw new Error("Error al agregar los datos a la base de datos");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (optionAdded) {
+      readOptions();
+      setOptionAdded(false);
+    }
+  }, [optionAdded]);
+
+  const handleAddOption = (e) => {
+    e.preventDefault();
+    if (newOption) {
+      addOption();
+      setOptionAdded(true);
+      onClose();
+    }
+  };
 
   const preview = async (e) => {
     e.preventDefault();
@@ -43,44 +103,35 @@ export const Form = ({ setCurrentStep }) => {
         body: JSON.stringify(formState),
       });
       if (response.ok) {
-        // La llamada a la API fue exitosa
         setApiError("");
         const data = await response.json();
         updateData(data);
-        updateForm(formState)
+        updateForm(formState);
         setCurrentStep(1);
-        // Continuar con el flujo deseado
-      } else if (response.status === 404) {
-        // La llamada a la API devolvió un código de respuesta 404
-        setApiError("Error: API responded with 404");
+      } else if (response.status === 500) {
+        setApiError(
+          "Error al conectarse con la API. Revisar los datos del formulario"
+        );
         updateData(null);
       } else {
-        // Otro código de respuesta de error
         setApiError("Error: API responded with an unknown error");
         updateData(null);
       }
     } catch (error) {
-      // Error de red u otro error no esperado
-      setApiError("Error: Failed to call the API");
+      showToastFail(error.message);
       updateData(null);
     }
-    // updateForm(formState);
-    // fetch("http://localhost:8000/preview", {
-    //   method: "POST",
-    //   body: JSON.stringify(formState),
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Origin: "http://localhost:8000", // Asegúrate de incluir el encabezado Origin
-    //   },
-    //   mode: "cors",
-    // })
-    //   .then((response) => response.json())
-    //   .then((data) => updateData(data))
-    //   .catch((error) => console.log(error));
   };
 
   return (
-    <Container>
+    <Container p={4}>
+      <ModalNewOption
+        onClose={onClose}
+        isOpen={isOpen}
+        handleAddOption={handleAddOption}
+        handleChangeOption={handleChangeOption}
+        newOption={newOption}
+      />
       {apiError && (
         <Text color="red" my={2}>
           {apiError}
@@ -104,8 +155,14 @@ export const Form = ({ setCurrentStep }) => {
             </Select>
           </FormControl>
 
-          <FormControl>
-            <Input type="date" />
+          <FormControl isRequired>
+            <FormLabel>FECHA</FormLabel>
+            <Input
+              type="date"
+              onChange={handleChange}
+              name="DATE"
+              value={formState.DATE}
+            />
           </FormControl>
 
           <FormControl isRequired>
@@ -117,8 +174,11 @@ export const Form = ({ setCurrentStep }) => {
               onChange={handleChange}
             />
           </FormControl>
-          <Button type="submit" colorScheme="blue">
+          <Button type="submit" colorScheme="whatsapp">
             Siguiente
+          </Button>
+          <Button colorScheme="whatsapp" variant="ghost" onClick={onOpen}>
+            Agregar mikrotik
           </Button>
         </VStack>
       </form>

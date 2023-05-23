@@ -14,13 +14,13 @@ import {
   Tr,
   useToast,
 } from "@chakra-ui/react";
-import { useContext, useState } from "react";
-import { Context } from "./context/context";
+import { useContext } from "react";
+import { Context } from "../context/context";
 
 export const List = ({ setCurrentStep }) => {
   const { data, form } = useContext(Context);
   const toast = useToast();
-  // const [highlightedAfter, setHighlightedAfter] = useState([]);
+
   if (!data || !data[0]) {
     return (
       <Center>
@@ -28,17 +28,6 @@ export const List = ({ setCurrentStep }) => {
       </Center>
     );
   }
-
-  // const highlightDifferences = () => {
-  //   const differences = data[1].filter(
-  //     (item1) => !data[0].some((item2) => item1.id === item2.id)
-  //   );
-  //   const highlightedAfter = data[1].map((item) => {
-  //     const isDifferent = differences.some((diff) => diff.id === item.id);
-  //     return { ...item, isDifferent };
-  //   });
-  //   setHighlightedAfter(highlightedAfter);
-  // };
 
   const url = "http://localhost:8000";
   const showToastSuccess = () => {
@@ -113,7 +102,8 @@ export const List = ({ setCurrentStep }) => {
                 padding={6}
                 boxShadow="0 0 0 1px gray"
                 borderRadius="md"
-                bg="green.200"
+                bg="green.400"
+                fontWeight="bold"
                 my={4}
               >
                 <Text>{item.ip}</Text>
@@ -128,7 +118,9 @@ export const List = ({ setCurrentStep }) => {
                 padding={6}
                 boxShadow="0 0 0 1px gray"
                 borderRadius="md"
-                bg="green.200"
+                bg="green.400"
+                // color='white'
+                fontWeight="bold"
                 // color={item.isDifferent ? "red.200" : "green.200"}
                 my={4}
               >
@@ -140,12 +132,16 @@ export const List = ({ setCurrentStep }) => {
         </Tr>
       </Tbody>
       <Center>
-        <Button onClick={executeScript} colorScheme="blue" my={4}>
+        <Button
+          onClick={executeScript}
+          colorScheme="whatsapp"
+          size="lg"
+          width="20rem"
+          mb={8}
+          mt={4}
+        >
           Enviar
         </Button>
-        {/* <Button onClick={highlightDifferences} colorScheme="blue" my={4}>
-          Ver
-        </Button> */}
       </Center>
     </Table>
   );
