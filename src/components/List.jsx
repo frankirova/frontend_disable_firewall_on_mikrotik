@@ -69,6 +69,7 @@ export const List = ({ setCurrentStep }) => {
         console.error(error);
       });
   };
+  console.log(form)
 
   return (
     <Table>
@@ -102,7 +103,7 @@ export const List = ({ setCurrentStep }) => {
                 padding={6}
                 boxShadow="0 0 0 1px gray"
                 borderRadius="md"
-                bg="green.400"
+                bg="green.200"
                 fontWeight="bold"
                 my={4}
               >
@@ -118,7 +119,7 @@ export const List = ({ setCurrentStep }) => {
                 padding={6}
                 boxShadow="0 0 0 1px gray"
                 borderRadius="md"
-                bg="green.400"
+                bg="green.300"
                 // color='white'
                 fontWeight="bold"
                 // color={item.isDifferent ? "red.200" : "green.200"}

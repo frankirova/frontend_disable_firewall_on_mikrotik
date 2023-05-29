@@ -12,6 +12,8 @@ import {
   FormControl,
   FormLabel,
   Container,
+  Text,
+  Flex,
 } from "@chakra-ui/react";
 
 export const Form = ({ setCurrentStep }) => {
@@ -52,7 +54,6 @@ export const Form = ({ setCurrentStep }) => {
   };
   const addOption = async () => {
     // Función para llamar a la API y agregar los datos a la base de datos
-
     try {
       const url = "http://localhost:8000/addDoc";
       const requestOptions = {
@@ -122,9 +123,9 @@ export const Form = ({ setCurrentStep }) => {
       updateData(null);
     }
   };
-
+  console.log(formState);
   return (
-    <Container p={4}>
+    <Container minHeight="80vh">
       <ModalNewOption
         onClose={onClose}
         isOpen={isOpen}
@@ -138,7 +139,7 @@ export const Form = ({ setCurrentStep }) => {
         </Text>
       )}
       <form onSubmit={preview}>
-        <VStack spacing={4} align="stretch">
+        <VStack spacing={4} align="stretch" justify="center">
           <FormControl isRequired>
             <FormLabel>IP MIKROTIK</FormLabel>
             <Select
